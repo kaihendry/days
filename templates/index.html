@@ -1,0 +1,18 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>{{ .Month.Format "January 2006" }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<form>
+<input type="month" value='{{ .Month.Format "2006-01" }}' name="month">
+<input type="submit" value="Show days">
+</form>
+<pre>
+{{range $day := .Days -}}
+{{ $day.Format "2006-01-02 Mon" }}
+{{end}}
+</pre>
+</body>
+</html>
