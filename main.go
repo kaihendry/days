@@ -15,6 +15,8 @@ import (
 
 //go:embed templates
 var tmpl embed.FS
+
+// Version from the Makefile shows what version we're running
 var Version string
 
 func days(month time.Time) (days []time.Time) {
@@ -41,9 +43,11 @@ func main() {
 		err = t.ExecuteTemplate(rw, "index.html", struct {
 			Month   time.Time
 			Days    []time.Time
-			Time    time.Time
 			Version string
-		}{chosenDate, days(chosenDate), time.Now(), Version})
+		}{
+			chosenDate,
+			days(chosenDate),
+			Version})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			log.WithError(err).Fatal("Failed to execute templates")
@@ -51,13 +55,13 @@ func main() {
 	})
 
 	port := os.Getenv("_LAMBDA_SERVER_PORT")
-	if port == "" {
+	if port == "" { // develop locally with https://github.com/codegangsta/gin
 		log.SetHandler(text.Default)
 		err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	} else {
+		// we're in the AWS context
 		log.SetHandler(jsonhandler.Default)
 		err = gateway.ListenAndServe("", nil)
 	}
 	log.Fatalf("failed to start server: %v", err)
-
 }
