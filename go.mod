@@ -3,7 +3,7 @@ module example.com/test
 go 1.17
 
 require (
-	github.com/apex/gateway v1.1.2
+	github.com/apex/gateway/v2 v2.0.0
 	github.com/apex/log v1.9.0
 )
 

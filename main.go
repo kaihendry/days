@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/apex/gateway"
+	"github.com/apex/gateway/v2"
 	"github.com/apex/log"
 	jsonhandler "github.com/apex/log/handlers/json"
 	"github.com/apex/log/handlers/text"
@@ -39,11 +39,11 @@ func main() {
 		}
 		rw.Header().Set("Content-Type", "text/html")
 		err = t.ExecuteTemplate(rw, "index.html", struct {
-			Month  time.Time
-			Days   []time.Time
-			Time   time.Time
-			Header http.Header
-		}{chosenDate, days(chosenDate), time.Now(), r.Header})
+			Month   time.Time
+			Days    []time.Time
+			Time    time.Time
+			Version string
+		}{chosenDate, days(chosenDate), time.Now(), Version})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			log.WithError(err).Fatal("Failed to execute templates")
