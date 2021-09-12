@@ -1,4 +1,4 @@
-module example.com/test
+module github.com/kaihendry/days
 
 go 1.17
 
