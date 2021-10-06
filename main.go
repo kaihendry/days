@@ -20,10 +20,11 @@ var tmpl embed.FS
 var Version string
 
 func days(month time.Time) (days []time.Time) {
-	monthEnd := month.AddDate(0, 1, -1) // add a month, minus a day
+	firstDay := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, time.UTC)
+	monthEnd := firstDay.AddDate(0, 1, -1) // add a month, minus a day
 	log.WithField("monthEnd", monthEnd).Info("last day")
 	for i := 0; i < monthEnd.Day(); i++ {
-		days = append(days, month.AddDate(0, 0, i))
+		days = append(days, firstDay.AddDate(0, 0, i))
 	}
 	log.WithFields(log.Fields{"month": month, "days": days}).Info("days of a month")
 	return days
