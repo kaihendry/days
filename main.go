@@ -21,10 +21,12 @@ var Version string
 
 func days(month time.Time) (days []time.Time) {
 	monthEnd := month.AddDate(0, 1, -1) // add a month, minus a day
+	log.WithField("monthEnd", monthEnd).Info("last day")
 	for i := 0; i < monthEnd.Day(); i++ {
 		days = append(days, month.AddDate(0, 0, i))
 	}
-	return
+	log.WithFields(log.Fields{"month": month, "days": days}).Info("days of a month")
+	return days
 }
 
 func main() {
