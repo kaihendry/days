@@ -17,6 +17,8 @@ Resources:
 
   MainFunction:
     Type: AWS::Serverless::Function
+    Architectures:
+      - x86_64
     Properties:
       CodeUri: .
       Runtime: go1.x
