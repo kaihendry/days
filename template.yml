@@ -39,4 +39,4 @@ Outputs:
   MainFunctionLogs:
     Value: !Sub "sam logs --name ${MainFunction} --region ${AWS::Region} --tail"
   DomainAPI:
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
