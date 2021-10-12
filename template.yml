@@ -38,5 +38,3 @@ Outputs:
     Value: !Sub "https://${Gateway}.execute-api.${AWS::Region}.amazonaws.com/"
   MainFunctionLogs:
     Value: !Sub "sam logs --name ${MainFunction} --region ${AWS::Region} --tail"
-  DomainAPI:
-    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
