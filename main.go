@@ -26,7 +26,7 @@ func days(month time.Time) (days []time.Time) {
 	for i := 0; i < monthEnd.Day(); i++ {
 		days = append(days, firstDay.AddDate(0, 0, i))
 	}
-	log.WithFields(log.Fields{"month": month, "days": days}).Info("days of a month")
+	log.WithFields(log.Fields{"month": month, "days": days}).Debug("days of a month")
 	return days
 }
 

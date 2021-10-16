@@ -1,6 +1,6 @@
 STACK = days
-PROFILE = default
-VERSION = "0.2"
+PROFILE = mine
+VERSION = "0.3"
 
 .PHONY: build deploy validate destroy
 
