@@ -1,22 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>{{ .Month.Format "January 2006" }}</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="icon" href="data:,">
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+        }
+
+        li {
+            list-style-type: none;
+        }
+    </style>
+    <title>Days of {{ .Month.Format "January 2006" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:,">
 </head>
+
 <body>
-<form>
-<input type="month" value='{{ .Month.Format "2006-01" }}' name="month">
-<input type="submit" value="Show days">
-</form>
-<pre>
-{{range $day := .Days -}}
-{{ $day.Format "2006-01-02 Mon" }}
-{{end}}
-</pre>
-<br>
-<p>Version: {{ .Version }} - <a href="https://github.com/kaihendry/days">Source code</a></p>
+    <form>
+        <input type="month" value='{{ .Month.Format "2006-01" }}' name="month">
+        <input type="submit" value="Show days">
+    </form>
+    <ol>
+        {{range $day := .Days -}}
+        {{ if eq $day.YearDay $.Now.YearDay }}
+        <li><strong>{{ $day.Format "2006-01-02 Mon" }}</strong></li>
+        {{ else }}
+        <li>{{ $day.Format "2006-01-02 Mon" }}</li>
+        {{ end }}
+        {{end}}
+    </ol>
+    <br>
+    <p>Version: {{ .Version }} - <a href="https://github.com/kaihendry/days">Source code</a></p>
 </body>
+
 </html>

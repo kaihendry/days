@@ -44,10 +44,12 @@ func main() {
 		}
 		rw.Header().Set("Content-Type", "text/html")
 		err = t.ExecuteTemplate(rw, "index.html", struct {
+			Now     time.Time
 			Month   time.Time
 			Days    []time.Time
 			Version string
 		}{
+			time.Now(),
 			chosenDate,
 			days(chosenDate),
 			Version})

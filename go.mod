@@ -8,6 +8,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-lambda-go v1.17.0 // indirect
+	github.com/aws/aws-lambda-go v1.27.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 )
