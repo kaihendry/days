@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
@@ -17,11 +17,12 @@ Resources:
 
   MainFunction:
     Type: AWS::Serverless::Function
-    Architectures:
-      - x86_64
     Properties:
+      Architectures:
+        - arm64
       CodeUri: .
-      Runtime: go1.x
+      Handler: main
+      Runtime: provided.al2
       Events:
         CatchAll:
           Type: HttpApi
@@ -29,7 +30,6 @@ Resources:
             ApiId: !Ref Gateway
             Path: /{proxy+}
             Method: ANY
-      Handler: main
     Metadata:
       BuildMethod: makefile
 

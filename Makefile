@@ -12,7 +12,7 @@ deploy:
 	SAM_CLI_TELEMETRY=0 AWS_PROFILE=$(PROFILE) sam deploy --resolve-s3 --stack-name $(STACK) --parameter-overrides DomainName=$(DOMAINNAME) ACMCertificateArn=$(ACMCERTIFICATEARN) --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM
 
 build-MainFunction:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=$(VERSION)" -o ${ARTIFACTS_DIR}/main
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags "-X main.Version=$(VERSION)" -o ${ARTIFACTS_DIR}/bootstrap
 
 validate:
 	AWS_PROFILE=$(PROFILE) aws cloudformation validate-template --template-body file://template.yml
