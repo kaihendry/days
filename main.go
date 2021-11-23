@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -37,10 +38,14 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		chosenDate, err := time.Parse("2006-01", r.URL.Query().Get("month"))
-		if err != nil {
-			log.Warn("bad input, defaulting to current month")
-			chosenDate = time.Now()
+		chosenDate := time.Now()
+		inputMonth := r.URL.Query().Get("month")
+		if inputMonth != "" {
+			chosenDate, err = time.Parse("2006-01", r.URL.Query().Get("month"))
+			if err != nil {
+				log.Warn("bad input, defaulting to current month")
+				chosenDate = time.Now()
+			}
 		}
 		rw.Header().Set("Content-Type", "text/html")
 		err = t.ExecuteTemplate(rw, "index.html", struct {
@@ -59,14 +64,13 @@ func main() {
 		}
 	})
 
-	port := os.Getenv("_LAMBDA_SERVER_PORT")
-	if port == "" { // develop locally with https://github.com/codegangsta/gin
-		log.SetHandler(text.Default)
-		err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
-	} else {
-		// we're in the AWS context
-		log.SetHandler(jsonhandler.Default)
+	log.SetHandler(jsonhandler.Default)
+
+	if _, ok := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); ok {
 		err = gateway.ListenAndServe("", nil)
+	} else {
+		log.SetHandler(text.Default)
+		err = http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), nil)
 	}
-	log.Fatalf("failed to start server: %v", err)
+	log.WithError(err).Fatal("error listening")
 }
