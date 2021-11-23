@@ -20,5 +20,8 @@ validate:
 destroy:
 	AWS_PROFILE=$(PROFILE) aws cloudformation delete-stack --stack-name $(STACK)
 
+sam-tail-logs:
+	AWS_PROFILE=$(PROFILE) sam logs --stack-name $(STACK) --tail
+
 clean:
 	rm -rf main gin-bin

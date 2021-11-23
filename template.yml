@@ -8,12 +8,26 @@ Parameters:
     Type: String
 
 Resources:
+  # Create log group for Access logs
+  AccessLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Ref DomainName
+
+
   Gateway:
     Type: AWS::Serverless::HttpApi
     Properties:
-      Domain:
-        DomainName: !Ref DomainName
-        CertificateArn: !Ref ACMCertificateArn
+     DefaultRouteSettings:
+      ThrottlingBurstLimit: 10
+      ThrottlingRateLimit: 10
+      DetailedMetricsEnabled: true
+     AccessLogSettings:
+      DestinationArn: !GetAtt AccessLogGroup.Arn
+      Format: '{"requestTime":"$context.requestTime","requestId":"$context.requestId","httpMethod":"$context.httpMethod","path":"$context.path","resourcePath":"$context.resourcePath","status":$context.status,"responseLatency":$context.responseLatency,"ip":"$context.identity.sourceIp","userAgent":"$context.identity.userAgent","integrationRequestId":"$context.integration.requestId","functionResponseStatus":"$context.integration.status","integrationLatency":"$context.integration.latency","integrationServiceStatus":"$context.integration.integrationStatus"}'
+     Domain:
+      DomainName: !Ref DomainName
+      CertificateArn: !Ref ACMCertificateArn
 
   MainFunction:
     Type: AWS::Serverless::Function
@@ -36,5 +50,3 @@ Resources:
 Outputs:
   GatewayEndPoint:
     Value: !Sub "https://${Gateway}.execute-api.${AWS::Region}.amazonaws.com/"
-  MainFunctionLogs:
-    Value: !Sub "sam logs --name ${MainFunction} --region ${AWS::Region} --tail"
