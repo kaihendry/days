@@ -6,8 +6,6 @@ Parameters:
     Type: String
   ACMCertificateArn:
     Type: String
-  Version:
-    Type: String
 
 Resources:
   # Create log group for Access logs
