@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"time"
 
 	"github.com/apex/gateway/v2"
@@ -14,9 +15,6 @@ import (
 
 //go:embed templates
 var tmpl embed.FS
-
-// Version from the Makefile shows what version we're running
-var Version string
 
 func days(month time.Time) (days []time.Time) {
 	firstDay := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, time.UTC)
@@ -35,6 +33,9 @@ func getWeekNumber(t time.Time) int {
 }
 
 func main() {
+
+	commit, _ := GitCommit()
+
 	t, err := template.New("base").Funcs(template.FuncMap{"weekNumber": getWeekNumber}).ParseFS(tmpl, "templates/*.html")
 	if err != nil {
 		slog.Error("Failed to parse templates", "error", err)
@@ -61,7 +62,7 @@ func main() {
 			time.Now(),
 			chosenDate,
 			days(chosenDate),
-			Version})
+			commit})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			slog.Error("Failed to execute templates", "error", err)
@@ -77,4 +78,20 @@ func main() {
 		err = http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), nil)
 	}
 	slog.Error("error listening", "error", err)
+}
+
+func GitCommit() (commit string, dirty bool) {
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "", false
+	}
+	for _, setting := range bi.Settings {
+		switch setting.Key {
+		case "vcs.modified":
+			dirty = setting.Value == "true"
+		case "vcs.revision":
+			commit = setting.Value
+		}
+	}
+	return
 }

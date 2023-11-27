@@ -6,6 +6,8 @@ Parameters:
     Type: String
   ACMCertificateArn:
     Type: String
+  Version:
+    Type: String
 
 Resources:
   # Create log group for Access logs
@@ -46,5 +48,6 @@ Globals:
       LogFormat: JSON
 
 Outputs:
-  GatewayEndPoint:
-    Value: !Sub "https://${Gateway}.execute-api.${AWS::Region}.amazonaws.com/"
+  CNAME:
+    Description: The regional domain name for CNAME value
+    Value: !GetAtt [Gateway.DomainName, RegionalDomainName]
