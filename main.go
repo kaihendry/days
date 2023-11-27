@@ -4,14 +4,12 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/apex/gateway/v2"
-	"github.com/apex/log"
-	jsonhandler "github.com/apex/log/handlers/json"
-	"github.com/apex/log/handlers/text"
 )
 
 //go:embed templates
@@ -23,18 +21,24 @@ var Version string
 func days(month time.Time) (days []time.Time) {
 	firstDay := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, time.UTC)
 	monthEnd := firstDay.AddDate(0, 1, -1) // add a month, minus a day
-	log.WithField("monthEnd", monthEnd).Info("last day")
+	slog.Info("last day", "monthEnd", monthEnd)
 	for i := 0; i < monthEnd.Day(); i++ {
 		days = append(days, firstDay.AddDate(0, 0, i))
 	}
-	log.WithFields(log.Fields{"month": month, "days": days}).Debug("days of a month")
+	slog.Debug("days of a month", "month", month, "days", days)
 	return days
 }
 
+func getWeekNumber(t time.Time) int {
+	_, week := t.ISOWeek()
+	return week
+}
+
 func main() {
-	t, err := template.ParseFS(tmpl, "templates/*.html")
+	t, err := template.New("base").Funcs(template.FuncMap{"weekNumber": getWeekNumber}).ParseFS(tmpl, "templates/*.html")
 	if err != nil {
-		log.WithError(err).Fatal("Failed to parse templates")
+		slog.Error("Failed to parse templates", "error", err)
+		return
 	}
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
@@ -43,8 +47,8 @@ func main() {
 		if inputMonth != "" {
 			chosenDate, err = time.Parse("2006-01", r.URL.Query().Get("month"))
 			if err != nil {
-				log.Warn("bad input, defaulting to current month")
 				chosenDate = time.Now()
+				slog.Warn("bad input, defaulting to current month", "month", chosenDate.Format("2006-01"))
 			}
 		}
 		rw.Header().Set("Content-Type", "text/html")
@@ -60,17 +64,17 @@ func main() {
 			Version})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			log.WithError(err).Fatal("Failed to execute templates")
+			slog.Error("Failed to execute templates", "error", err)
 		}
 	})
 
-	log.SetHandler(jsonhandler.Default)
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
 	if _, ok := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); ok {
 		err = gateway.ListenAndServe("", nil)
 	} else {
-		log.SetHandler(text.Default)
+		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
 		err = http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), nil)
 	}
-	log.WithError(err).Fatal("error listening")
+	slog.Error("error listening", "error", err)
 }

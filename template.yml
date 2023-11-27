@@ -12,6 +12,7 @@ Resources:
   AccessLogGroup:
     Type: "AWS::Logs::LogGroup"
     Properties:
+      RetentionInDays: 30
       LogGroupName: !Ref DomainName
 
   Gateway:
@@ -38,6 +39,11 @@ Resources:
             Method: ANY
     Metadata:
       BuildMethod: makefile
+
+Globals:
+  Function:
+    LoggingConfig:
+      LogFormat: JSON
 
 Outputs:
   GatewayEndPoint:
