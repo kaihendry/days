@@ -8,7 +8,7 @@
     <link rel="icon" href="data:,">
 
     <style>
-      body {
+        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
             background-color: #f4f4f4;
             margin: 0;
@@ -32,7 +32,8 @@
 
         p strong {
             font-weight: bold;
-            color: #d35400; /* A distinct color for the current day */
+            color: #d35400;
+            /* A distinct color for the current day */
         }
 
         form {
@@ -73,7 +74,7 @@
     {{ if eq ($day.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
     <p><strong>{{ $day.Format "2006-01-02 Mon" }}</strong></p>
     {{ else }}
-    <p>{{ $day.Format "2006-01-02 Mon" }}</p>
+    <p>{{- $day.Format "2006-01-02 Mon" }}</p>
     {{ end }}
     {{end}}
 
