@@ -20,8 +20,9 @@ import (
 var tmpl embed.FS
 
 type day struct {
-	Date      time.Time
-	IsHoliday bool
+	Date           time.Time
+	IsHoliday      bool
+	HolidaySummary string
 }
 
 func days(month time.Time) (days []day) {
@@ -100,6 +101,7 @@ func main() {
 					}
 					if d.Date.After(start) && d.Date.Before(end) {
 						days[i].IsHoliday = true
+						days[i].HolidaySummary = h.GetProperty(ics.ComponentPropertySummary).Value
 					}
 				}
 			}

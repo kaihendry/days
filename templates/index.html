@@ -93,11 +93,10 @@
         
         <p>
           {{- $day.Date.Format "2006-01-02 Mon" }}
-          {{ if $day.IsHoliday }}<span> (Holiday)</span>{{ end }}
+          {{ if $day.IsHoliday }}<span> ({{ $day.HolidaySummary }})</span>{{ end }}
         </p>
         
         {{ end }}
-        
         {{end}}
     </main>
 
