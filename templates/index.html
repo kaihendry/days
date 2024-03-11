@@ -16,7 +16,8 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            justify-content: center;
+        align-items: center;
         }
 
         h2 {
@@ -28,6 +29,7 @@
         p {
             margin: 0.25rem 0;
             font-size: 1rem;
+            text-align: left;
         }
 
         p strong {
@@ -60,9 +62,12 @@
 </head>
 
 <body>
+    <nav>
     <form>
         <input type="month" value='{{ .Month.Format "2006-01" }}' name="month" onchange="this.form.submit()">
     </form>
+</nav>
+    <main>
     {{ $previousWeek := -1 }} <!-- Initialize a variable to track the previous week number -->
     {{range $day := .Days -}}
     {{ $currentWeek := $day | weekNumber }} <!-- Get the current week number -->
@@ -77,6 +82,7 @@
     <p>{{- $day.Format "2006-01-02 Mon" }}</p>
     {{ end }}
     {{end}}
+    </main>
 
     <br>
     <p>Version: {{ .Version }} - <a href="https://github.com/kaihendry/days">Source code</a></p>
