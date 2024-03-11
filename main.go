@@ -4,13 +4,16 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/apex/gateway/v2"
+	ics "github.com/arran4/golang-ical"
 )
 
 //go:embed templates
@@ -57,17 +60,64 @@ func main() {
 				slog.Warn("bad input, defaulting to current month", "month", chosenDate.Format("2006-01"))
 			}
 		}
+		days := days(chosenDate)
+
+		icsURL := r.URL.Query().Get("ics")
+		// check icsURL is indeed a URL
+		if icsURL != "" {
+			// get ics file
+			icsData, err := fetch(icsURL)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				slog.Error("Failed to fetch ics", "error", err)
+				return
+			}
+			cal, err := ics.ParseCalendar(strings.NewReader(icsData))
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				slog.Error("Failed to parse ics", "error", err)
+				return
+			}
+			holidays, err := findHolidays(cal)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				slog.Error("Failed to find holidays", "error", err)
+				return
+			}
+			for i, d := range days {
+				for _, h := range holidays {
+					start, err := h.GetDtStampTime()
+					if err != nil {
+						http.Error(rw, err.Error(), http.StatusInternalServerError)
+						slog.Error("Failed to get start time", "error", err)
+						return
+					}
+					end, err := h.GetEndAt()
+					if err != nil {
+						http.Error(rw, err.Error(), http.StatusInternalServerError)
+						slog.Error("Failed to get end time", "error", err)
+						return
+					}
+					if d.Date.After(start) && d.Date.Before(end) {
+						days[i].IsHoliday = true
+					}
+				}
+			}
+		}
+
 		rw.Header().Set("Content-Type", "text/html")
 		err = t.ExecuteTemplate(rw, "index.html", struct {
 			Now     time.Time
 			Month   time.Time
 			Days    []day
 			Version string
+			IcsURL  string
 		}{
 			time.Now(),
 			chosenDate,
-			days(chosenDate),
-			commit})
+			days,
+			commit,
+			icsURL})
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			slog.Error("Failed to execute templates", "error", err)
@@ -99,4 +149,43 @@ func GitCommit() (commit string, dirty bool) {
 		}
 	}
 	return
+}
+
+func findHolidays(cal *ics.Calendar) (holidays []ics.VEvent, err error) {
+	for _, event := range cal.Events() {
+		start, err := event.GetDtStampTime()
+		if err != nil {
+			return nil, err
+		}
+		end, err := event.GetEndAt()
+		if err != nil {
+			return nil, err
+		}
+		// if duration is above a day, it's a holiday
+		if end.Sub(start).Hours()/24 > 1 {
+			holidays = append(holidays, *event)
+		}
+	}
+	return holidays, nil
+}
+
+func fetch(url string) (string, error) {
+	c := http.Client{Timeout: 1 * time.Second}
+
+	slog.Debug("http get", "url", url)
+	resp, err := c.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to download %s: %s", url, resp.Status)
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }

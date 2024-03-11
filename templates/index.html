@@ -65,6 +65,9 @@
     <nav>
     <form>
         <input type="month" value='{{ .Month.Format "2006-01" }}' name="month" onchange="this.form.submit()">
+        {{ if .IcsURL }}
+        <p><input name="ics" value="{{ .IcsURL }}"></p>
+        {{ end }}
     </form>
 </nav>
     <main>
