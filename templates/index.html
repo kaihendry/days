@@ -50,6 +50,12 @@
             margin-bottom: 1rem;
         }
 
+        pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: inherit;
+}
+
         a {
             color: #2a5db0;
             text-decoration: none;
@@ -70,34 +76,20 @@
         {{ end }}
     </form>
 </nav>
-    <main>
-        {{ $previousWeek := -1 }} <!-- Initialize a variable to track the previous week number -->
-
-        {{range $day := .Days }}
-        
-        {{ $currentWeek := $day.Date | weekNumber }} <!-- Get the current week number -->
-        
-        {{ if ne $currentWeek $previousWeek }} <!-- Compare with the previous week number -->
-        
-        <h2>Week Number: {{ $currentWeek }}</h2> <!-- Print the week number if it's different -->
-        
-        {{ $previousWeek = $currentWeek }} <!-- Update the previous week number -->
-        
-        {{ end }}
-        
-        {{ if eq ($day.Date.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
-        
-        <p><strong>{{ $day.Date.Format "2006-01-02 Mon" }}</strong></p>
-        
-        {{ else }}
-        
-        <p>
-          {{- $day.Date.Format "2006-01-02 Mon" }}
-          {{ if $day.IsHoliday }}<span> ({{ $day.HolidaySummary }})</span>{{ end }}
-        </p>
-        
-        {{ end }}
-        {{end}}
+<main>
+    {{- $previousWeek := -1 }}{{/* Initialize a variable to track the previous week number */}}
+    {{range $day := .Days -}}
+    {{- $currentWeek := $day.Date | weekNumber }}{{/* Get the current week number */}}
+    {{- if ne $currentWeek $previousWeek }}{{/* Compare with the previous week number */}}
+    <h2>Week Number: {{$currentWeek}}</h2>{{/* Print the week number if it's different */}}
+    {{- $previousWeek = $currentWeek }}{{/* Update the previous week number */}}
+    {{- end }}
+    {{- if eq ($day.Date.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
+    <pre><strong>{{$day.Date.Format "2006-01-02 Mon"}}</strong></pre>
+    {{- else }}
+    <pre>{{$day.Date.Format "2006-01-02 Mon"}}{{if $day.IsHoliday}}<span> ({{$day.HolidaySummary}})</span>{{end}}</pre>
+    {{- end }}
+    {{- end }}
     </main>
 
     <br>
@@ -105,3 +97,4 @@
 </body>
 
 </html>
+
