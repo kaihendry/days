@@ -28,7 +28,7 @@ type day struct {
 func days(month time.Time) (days []day) {
 	firstDay := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, time.UTC)
 	monthEnd := firstDay.AddDate(0, 1, -1) // add a month, minus a day
-	slog.Info("last day", "monthEnd", monthEnd)
+	slog.Debug("last day", "monthEnd", monthEnd)
 	for i := 0; i < monthEnd.Day(); i++ {
 		days = append(days, day{Date: firstDay.AddDate(0, 0, i)})
 	}
