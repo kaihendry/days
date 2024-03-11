@@ -16,12 +16,17 @@ import (
 //go:embed templates
 var tmpl embed.FS
 
-func days(month time.Time) (days []time.Time) {
+type day struct {
+	Date      time.Time
+	IsHoliday bool
+}
+
+func days(month time.Time) (days []day) {
 	firstDay := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, time.UTC)
 	monthEnd := firstDay.AddDate(0, 1, -1) // add a month, minus a day
 	slog.Info("last day", "monthEnd", monthEnd)
 	for i := 0; i < monthEnd.Day(); i++ {
-		days = append(days, firstDay.AddDate(0, 0, i))
+		days = append(days, day{Date: firstDay.AddDate(0, 0, i)})
 	}
 	slog.Debug("days of a month", "month", month, "days", days)
 	return days
@@ -56,7 +61,7 @@ func main() {
 		err = t.ExecuteTemplate(rw, "index.html", struct {
 			Now     time.Time
 			Month   time.Time
-			Days    []time.Time
+			Days    []day
 			Version string
 		}{
 			time.Now(),

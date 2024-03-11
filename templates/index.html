@@ -68,20 +68,34 @@
     </form>
 </nav>
     <main>
-    {{ $previousWeek := -1 }} <!-- Initialize a variable to track the previous week number -->
-    {{range $day := .Days -}}
-    {{ $currentWeek := $day | weekNumber }} <!-- Get the current week number -->
-    {{ if ne $currentWeek $previousWeek }} <!-- Compare with the previous week number -->
-    <h2>Week Number: {{ $currentWeek }}</h2> <!-- Print the week number if it's different -->
-    {{ $previousWeek = $currentWeek }} <!-- Update the previous week number -->
-    {{ end }}
+        {{ $previousWeek := -1 }} <!-- Initialize a variable to track the previous week number -->
 
-    {{ if eq ($day.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
-    <p><strong>{{ $day.Format "2006-01-02 Mon" }}</strong></p>
-    {{ else }}
-    <p>{{- $day.Format "2006-01-02 Mon" }}</p>
-    {{ end }}
-    {{end}}
+        {{range $day := .Days }}
+        
+        {{ $currentWeek := $day.Date | weekNumber }} <!-- Get the current week number -->
+        
+        {{ if ne $currentWeek $previousWeek }} <!-- Compare with the previous week number -->
+        
+        <h2>Week Number: {{ $currentWeek }}</h2> <!-- Print the week number if it's different -->
+        
+        {{ $previousWeek = $currentWeek }} <!-- Update the previous week number -->
+        
+        {{ end }}
+        
+        {{ if eq ($day.Date.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
+        
+        <p><strong>{{ $day.Date.Format "2006-01-02 Mon" }}</strong></p>
+        
+        {{ else }}
+        
+        <p>
+          {{- $day.Date.Format "2006-01-02 Mon" }}
+          {{ if $day.IsHoliday }}<span> (Holiday)</span>{{ end }}
+        </p>
+        
+        {{ end }}
+        
+        {{end}}
     </main>
 
     <br>
