@@ -73,7 +73,10 @@
 <body>
     <nav>
     <form>
+        <a href='?month={{ .Previous.Format "2006-01" }}'>Previous</a>
         <input type="month" value='{{ .Month.Format "2006-01" }}' name="month" onchange="this.form.submit()">
+        <a href='?month={{ .Next.Format "2006-01" }}'>Next</a>
+ 
         {{ if .IcsURL }}
         <p><input name="ics" value="{{ .IcsURL }}"></p>
         {{ end }}

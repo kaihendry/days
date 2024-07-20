@@ -109,14 +109,18 @@ func main() {
 
 		rw.Header().Set("Content-Type", "text/html")
 		err = t.ExecuteTemplate(rw, "index.html", struct {
-			Now     time.Time
-			Month   time.Time
-			Days    []day
-			Version string
-			IcsURL  string
+			Now      time.Time
+			Month    time.Time
+			Previous time.Time
+			Next     time.Time
+			Days     []day
+			Version  string
+			IcsURL   string
 		}{
 			time.Now(),
 			chosenDate,
+			chosenDate.AddDate(0, -1, 0),
+			chosenDate.AddDate(0, 1, 0),
 			days,
 			commit,
 			icsURL})
