@@ -1,6 +1,6 @@
 module github.com/kaihendry/days
 
-go 1.22
+go 1.23
 
 require (
 	github.com/apex/gateway/v2 v2.0.0
