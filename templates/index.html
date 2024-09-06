@@ -67,24 +67,41 @@
         a:hover {
             text-decoration: underline;
         }
+
+.holiday {
+    color: #d35400;
+    font-weight: bold;
+}
+
     </style>
 </head>
 
 <body>
-    <nav>
-    <form>
-        {{ if .IcsURL }}
-        <a href='?month={{ .Previous.Format "2006-01" }}&ics={{ .IcsURL }}'>Previous</a>
-        {{ else }}
-        <a href='?month={{ .Previous.Format "2006-01" }}'>Previous</a>
-        {{ end }}
-        <input type="month" value='{{ .Month.Format "2006-01" }}' name="month" onchange="this.form.submit()">
-        {{ if .IcsURL }}
-        <a href='?month={{ .Next.Format "2006-01" }}&ics={{ .IcsURL }}'>Next</a>
-        {{ else }}
-        <a href='?month={{ .Next.Format "2006-01" }}'>Next</a>
-        {{ end }}
+<nav>
+<form id="monthForm">
+    <!-- Previous Button -->
+    <button type="button" onclick="updateMonth('{{ .Previous.Format "2006-01" }}')">Previous</button>
+
+    <!-- Month Picker -->
+    <input type="month" value='{{ .Month.Format "2006-01" }}' name="month" onchange="this.form.submit()">
+
+    <!-- Next Button -->
+    <button type="button" onclick="updateMonth('{{ .Next.Format "2006-01" }}')">Next</button>
+
+    <!-- ICS Hidden Field -->
+    {{ if .IcsURL }}
+    <input type="hidden" name="ics" value="{{ .IcsURL }}">
+    {{ end }}
+</form>
 </nav>
+<script>
+function updateMonth(newMonth) {
+    // Set the value of the month input to the newMonth
+    document.querySelector('input[name="month"]').value = newMonth;
+    // Submit the form
+    document.getElementById('monthForm').submit();
+}
+</script>
 <main>
     {{- $previousWeek := -1 }}{{/* Initialize a variable to track the previous week number */}}
     {{range $day := .Days -}}
@@ -96,7 +113,7 @@
     {{- if eq ($day.Date.Format "2006-01-02") ($.Now.Format "2006-01-02") }}
     <pre><strong>{{$day.Date.Format "2006-01-02 Mon"}}</strong></pre>
     {{- else }}
-    <pre>{{$day.Date.Format "2006-01-02 Mon"}}{{if $day.IsHoliday}}<span> ({{$day.HolidaySummary}})</span>{{end}}</pre>
+    <pre>{{$day.Date.Format "2006-01-02 Mon"}}{{if $day.IsHoliday}}<span class="holiday">&nbsp;{{$day.HolidaySummary}}</span>{{end}}</pre>
     {{- end }}
     {{- end }}
     </main>

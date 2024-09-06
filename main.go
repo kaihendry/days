@@ -99,7 +99,7 @@ func main() {
 						slog.Error("Failed to get end time", "error", err)
 						return
 					}
-					if d.Date.After(start) && d.Date.Before(end) {
+					if (d.Date.After(start) || d.Date.Equal(start)) && (d.Date.Before(end) || d.Date.Equal(end)) {
 						days[i].IsHoliday = true
 						days[i].HolidaySummary = h.GetProperty(ics.ComponentPropertySummary).Value
 					}
