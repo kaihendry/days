@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/apex/gateway/v2 v2.0.0
-	github.com/arran4/golang-ical v0.3.1
+	github.com/arran4/golang-ical v0.3.2
 )
 
 require (
